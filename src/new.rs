@@ -29,10 +29,10 @@ pub fn command(name: Option<&str>, open: Option<&str>) -> Result<()> {
 
     let config = get_config();
 
-    let filename = match (config.get_string("new.name"), name) {
-        (_, Some(name)) => name.to_owned(),
-        (Ok(name), None) => name,
-        (Err(_), None) => {
+    let filename = match (name, config.get_string("new.name")) {
+        (Some(name), _) => name.to_owned(),
+        (None, Ok(name)) => name,
+        (None, Err(_)) => {
             bail!(
                 "No file name was provided for new note,\
                  and no default file name is set in config."
