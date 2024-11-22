@@ -10,9 +10,7 @@ use std::path::Component;
 use std::path::PathBuf;
 use std::process::Command;
 
-pub fn command(output_path: &str, open_command: Option<&str>) -> Result<()> {
-    check_vault().context("Not in a valid vault.")?;
-
+pub fn gather() -> Result<()> {
     // TODO: Make config option.
     let header_path = "header.typ";
     let directory = read_dir(".").context("Couldn't get contents of current directory.")?;
@@ -58,6 +56,14 @@ pub fn command(output_path: &str, open_command: Option<&str>) -> Result<()> {
     writer.flush().context(format!(
         "Failed to flush writer for scratch file {COMPILE_SCRATCH_PATH:?}."
     ))?;
+
+    Ok(())
+}
+
+pub fn command(output_path: &str, open_command: Option<&str>) -> Result<()> {
+    check_vault().context("Not in a valid vault.")?;
+
+    gather().context("Failed to gather all files in vault.")?;
 
     let command_output = Command::new("typst")
         .args(["compile", COMPILE_SCRATCH_PATH, output_path, "--root", "."])
