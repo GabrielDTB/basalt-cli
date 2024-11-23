@@ -18,3 +18,4 @@ const_format = "0.2.33"
 serde = { version = "1.0.210", features = ["derive"] }
 rand = "0.8.5"
 chrono = "0.4.38"
+itertools = "0.13.0"
