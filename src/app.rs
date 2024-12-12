@@ -21,6 +21,9 @@ pub enum Command {
     /// Compile a vault.
     Compile(CompileArgs),
 
+
+    /// Perform Typst queries on the vault.
+    Query(QueryArgs),
 }
 
 #[derive(Args, Debug)]
@@ -34,4 +37,10 @@ pub struct CompileArgs {
     /// Program to open result with.
     #[clap(long)]
     pub open: Option<String>,
+}
+
+#[derive(Args, Debug)]
+#[clap(trailing_var_arg = true)]
+pub struct QueryArgs {
+    pub args: Vec<String>,
 }
