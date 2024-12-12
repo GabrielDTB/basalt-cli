@@ -1,6 +1,7 @@
 use crate::init::check_vault;
 use crate::magic::COMPILE_SCRATCH_PATH;
 use anyhow::{anyhow, bail, Context, Result};
+use itertools::Itertools;
 use std::fs::read_dir;
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -19,7 +20,8 @@ pub fn command(output_path: &str, open_command: Option<&str>) -> Result<()> {
             path.extension()
                 .map(|ext| ext.eq_ignore_ascii_case("typ"))
                 .unwrap_or(false)
-        });
+        })
+        .sorted();
 
     let mut relative = PathBuf::new();
     for component in PathBuf::from(COMPILE_SCRATCH_PATH).components().skip(1) {
