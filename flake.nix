@@ -16,7 +16,9 @@
         };
       in
       {
-        devShells.default = with pkgs; mkShell {
+        devShells.default = with pkgs; mkShell.override{
+          stdenv = stdenvAdapters.useMoldLinker clangStdenv;
+        } {
           buildInputs = [
             openssl
             pkg-config
