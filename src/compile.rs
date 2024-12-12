@@ -2,6 +2,7 @@ use crate::init::check_vault;
 use crate::magic::COMPILE_SCRATCH_PATH;
 use anyhow::{anyhow, bail, Context, Result};
 use itertools::Itertools;
+use std::fs;
 use std::fs::read_dir;
 use std::fs::File;
 use std::io::{BufWriter, Write};
@@ -12,6 +13,8 @@ use std::process::Command;
 pub fn command(output_path: &str, open_command: Option<&str>) -> Result<()> {
     check_vault().context("Not in a valid vault.")?;
 
+    // TODO: Make config option.
+    let header_path = "header.typ";
     let directory = read_dir(".").context("Couldn't get contents of current directory.")?;
     let files = directory
         .filter_map(Result::ok)
@@ -38,7 +41,16 @@ pub fn command(output_path: &str, open_command: Option<&str>) -> Result<()> {
         "Failed to create scratch file {COMPILE_SCRATCH_PATH:?}."
     ))?;
     let mut writer = BufWriter::new(scratch);
+    let header = fs::read_to_string(header_path).context("Could not open header file.")?;
+    writeln!(writer, "{header}").context(format!("Failed to write to {COMPILE_SCRATCH_PATH:?}"))?;
     for file in files {
+        if file
+            .file_name()
+            .context("File is missing filename. How did this happen?")?
+            == header_path
+        {
+            continue;
+        }
         let path = relative.join(file);
         writeln!(writer, r#"#include("{}")"#, path.to_string_lossy())
             .context(format!("Failed to write to {COMPILE_SCRATCH_PATH:?}"))?;
